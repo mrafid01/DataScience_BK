@@ -270,6 +270,7 @@ with tab2:
 
   if file_uploaded:
     uploaded_df = pd.read_csv(file_uploaded)
+    uploaded_df_show = uploaded_df
     uploaded_df = scaler.transform(uploaded_df)
     prediction_arr = model.predict(uploaded_df)
 
@@ -312,4 +313,4 @@ with tab2:
     with col1:
       st.dataframe(uploaded_result)
     with col2:
-      st.dataframe(uploaded_df)
+      st.dataframe(uploaded_df_show)
