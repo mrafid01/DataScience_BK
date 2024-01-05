@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import MinMaxScaler
 import streamlit as st
 import time
 import pickle
@@ -85,6 +86,10 @@ y = df_clean['target']
 
 smote = SMOTE(random_state=42)
 X, y = smote.fit_resample(X, y)
+X2 = X
+
+scaler = MinMaxScaler()
+X = scaler.fit_transform(X)
 
 model = pickle.load(open("model/knn_model.pkl", 'rb'))
 
@@ -92,15 +97,15 @@ y_pred = model.predict(X)
 accuracy = accuracy_score(y, y_pred)
 accuracy = round((accuracy * 100), 2)
 
-df_final = X
-df_final['target'] = y
+df_final = X2
+df_final["target"] = y
 
 # ========================================================================================================================================================================================
 
 # STREAMLIT
 st.set_page_config(
-  page_title = "Hungarian Heart Disease",
-  page_icon = ":heart:"
+  page_title = "Hungarian Heart Disease - Rafid",
+  page_icon = ":mending_heart:"
 )
 
 st.title("Hungarian Heart Disease")
@@ -220,7 +225,8 @@ with tab1:
   st.write("")
   if predict_btn:
     inputs = [[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak]]
-    prediction = model.predict(inputs)[0]
+    inputs = scaler.transform(inputs)
+    prediction = model.predict(inputs)
 
     bar = st.progress(0)
     status_text = st.empty()
@@ -264,6 +270,7 @@ with tab2:
 
   if file_uploaded:
     uploaded_df = pd.read_csv(file_uploaded)
+    uploaded_df = scaler.transform(uploaded_df)
     prediction_arr = model.predict(uploaded_df)
 
     bar = st.progress(0)
